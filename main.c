@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <alsa/asoundlib.h>
 
+//midi message values to note mapping
 #define C4 60
 #define D4 62
 #define E4 64
@@ -31,6 +32,7 @@ GtkWidget *picture;
 snd_rawmidi_t *midiInHandle;
 /* Event handler functions */
 
+
 static gboolean delete_event( GtkWidget *widget, GdkEvent  *event, gpointer   data )
 {
     return FALSE;
@@ -41,7 +43,7 @@ static void destroy( GtkWidget *widget, gpointer   data )
     gtk_main_quit ();
 }
 
-
+//do the image update
 static void update_image(char* image)
 {
     gtk_container_remove(GTK_CONTAINER(window), GTK_WIDGET(picture));
@@ -52,6 +54,8 @@ static void update_image(char* image)
 
 }
 
+
+//Handle updating the displayed image from a given midi message
 static void midi_update_image(int midi_note)
 {
 
@@ -107,7 +111,7 @@ static void midi_update_image(int midi_note)
 
 }
 
-
+//check for midi input when not busy
 static void check_midi()
 {
 
@@ -117,22 +121,25 @@ static void check_midi()
 
     register int err;
 
-
+    //check whether we can read the midi stream
     if ((err = snd_rawmidi_read(midiInHandle, &command, 1)) < 0)
     {
         printf("Can't read MIDI input: %s\n", snd_strerror(err));
     }
+    else
+    {
+        //if no error then read the note and velocity parts of the midi message
+        snd_rawmidi_read(midiInHandle, &note, 1);
+        snd_rawmidi_read(midiInHandle, &velocity, 1);
+    }
 
-    snd_rawmidi_read(midiInHandle, &note, 1);
-    snd_rawmidi_read(midiInHandle, &velocity, 1);
-
+    //print out the note, currently for debug
     printf("%d\n",note);
+    //update the image with the last note
     midi_update_image(note);
-
-
 }
 
-
+//dev function used to manually trigger image updates
 static void button_press_callback( GtkWidget *widget, GdkEventKey *event, gpointer data )
 {
 
@@ -168,11 +175,11 @@ static void button_press_callback( GtkWidget *widget, GdkEventKey *event, gpoint
         //printf("%c",event->keyval);
         update_image("f.jpg");
         break;
-
     }
 
 }
 
+//list all the midi interfaces
 void list_midi_interfaces(char* midi_dev, int bufsize)
 {
     register int  err;
@@ -282,7 +289,7 @@ void list_midi_interfaces(char* midi_dev, int bufsize)
 
     snd_config_update_free_global();
 
-    printf("\nSelect the MIDI input to use\n");
+    printf("\nEnter the MIDI input to use (eg hw:1,0) > ");
     scanf("%s",user_midi);
 
     strncpy(midi_dev,user_midi,bufsize);
@@ -293,14 +300,15 @@ int main( int argc, char *argv[] )
     int buf_size = 7;
     char* midi_device = (char*) malloc(sizeof(char) * buf_size);
 
+    printf("The Key of Evil\n\nHit C7 on your midi controller to exit after the images have started\n\n");
+    printf("Listing MIDI hardware\n");
     list_midi_interfaces(midi_device,buf_size);
 
-    printf("Users selected %s\n",midi_device);
+    printf("User selected %s\n",midi_device);
 
     register int err;
-    //midi_device = "hw:2,0";
 
-    // Open input MIDI device hw:0,0,0
+    // Open input MIDI device selected by user
     if ((err = snd_rawmidi_open(&midiInHandle, 0, midi_device, 0)) < 0)
     {
         printf("Can't open MIDI input: %s\n", snd_strerror(err));
@@ -310,27 +318,27 @@ int main( int argc, char *argv[] )
     gtk_init(&argc, &argv);
 
 
-    /* ***** Create photo display ******/
+    // Create photo display
     window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
     pixbuf = gdk_pixbuf_new_from_file_at_scale("e4.jpg", 1280, 1024, TRUE, NULL);
     picture=gtk_image_new_from_pixbuf(pixbuf);
 
-    /* signal handlers would be here */
+    // signal handlers
     g_signal_connect (G_OBJECT (window), "delete_event",G_CALLBACK (delete_event), NULL);
     g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (destroy), NULL);
     //g_signal_connect (G_OBJECT (window), "key_press_event", G_CALLBACK (button_press_callback), NULL);
 
-    /* pack the image into the window & display */
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // pack the image into the window & display
     gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(picture));
     gtk_widget_show_all(GTK_WIDGET(window));
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    /* Set window to have no border etc. */
+    // Set window to have no border etc.
     gtk_window_set_decorated(window, FALSE);
     gtk_window_fullscreen(window);
 
+    //register the funtion to run when no other gtk work happening
     g_idle_add ((GSourceFunc)check_midi,NULL);
+
     /* Start main event loop */
     gtk_main();
 
