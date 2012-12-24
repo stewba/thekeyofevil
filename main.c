@@ -76,6 +76,12 @@ static void midi_update_image(int midi_note)
         update_image("f.jpg");
         break;
 
+    case 96:
+        //printf("%c",event->keyval);
+        gtk_exit(0);
+        break;
+
+
     }
 
 }
@@ -264,7 +270,7 @@ int main( int argc, char *argv[] )
     printf("Users selected %s",midi_device);
 
     register int err;
-    midi_device = "hw:2,0";
+    //midi_device = "hw:2,0";
 
     // Open input MIDI device hw:0,0,0
     if ((err = snd_rawmidi_open(&midiInHandle, 0, midi_device, 0)) < 0)
