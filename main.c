@@ -3,6 +3,17 @@
 #include <stdio.h>
 #include <alsa/asoundlib.h>
 
+#define C4 60
+#define D4 62
+#define E4 64
+#define F4 65
+#define G4 67
+#define A5 69
+#define B5 71
+#define C5 72
+#define EXIT 60
+
+
 /* Declare widgets etc.
 -----------------------*/
 
@@ -46,34 +57,44 @@ static void midi_update_image(int midi_note)
 
     switch(midi_note)
     {
-    case 60:
+    case C4:
         //printf("%c",event->keyval);
-        update_image("a.jpg");
+        update_image("c4.jpg");
         break;
 
-    case 62:
+    case D4:
         //printf("%c",event->keyval);
-        update_image("b.jpg");
+        update_image("d4.jpg");
         break;
 
-    case 64:
+    case E4:
         //printf("%c",event->keyval);
-        update_image("c.jpg");
+        update_image("e4.jpg");
         break;
 
-    case 65:
+    case F4:
         //printf("%c",event->keyval);
-        update_image("d.jpg");
+        update_image("f4.jpg");
         break;
 
-    case 67:
+    case G4:
         //printf("%c",event->keyval);
-        update_image("e.jpg");
+        update_image("g4.jpg");
         break;
 
-    case 69:
+    case A5:
         //printf("%c",event->keyval);
-        update_image("f.jpg");
+        update_image("a5.jpg");
+        break;
+
+    case B5:
+        //printf("%c",event->keyval);
+        update_image("b5.jpg");
+        break;
+
+    case C5:
+        //printf("%c",event->keyval);
+        update_image("c5.jpg");
         break;
 
     case 96:
@@ -90,16 +111,23 @@ static void midi_update_image(int midi_note)
 static void check_midi()
 {
 
-    unsigned char buffer;
+    unsigned char command;
+    unsigned char note;
+    unsigned char velocity;
+
     register int err;
 
-    if ((err = snd_rawmidi_read(midiInHandle, &buffer, 1)) < 0)
+
+    if ((err = snd_rawmidi_read(midiInHandle, &command, 1)) < 0)
     {
         printf("Can't read MIDI input: %s\n", snd_strerror(err));
     }
 
-    printf("%d\n",buffer);
-    midi_update_image(buffer);
+    snd_rawmidi_read(midiInHandle, &note, 1);
+    snd_rawmidi_read(midiInHandle, &velocity, 1);
+
+    printf("%d\n",note);
+    midi_update_image(note);
 
 
 }
@@ -267,7 +295,7 @@ int main( int argc, char *argv[] )
 
     list_midi_interfaces(midi_device,buf_size);
 
-    printf("Users selected %s",midi_device);
+    printf("Users selected %s\n",midi_device);
 
     register int err;
     //midi_device = "hw:2,0";
@@ -284,7 +312,7 @@ int main( int argc, char *argv[] )
 
     /* ***** Create photo display ******/
     window = GTK_WINDOW(gtk_window_new(GTK_WINDOW_TOPLEVEL));
-    pixbuf = gdk_pixbuf_new_from_file_at_scale("a.jpg", 1280, 1024, TRUE, NULL);
+    pixbuf = gdk_pixbuf_new_from_file_at_scale("e4.jpg", 1280, 1024, TRUE, NULL);
     picture=gtk_image_new_from_pixbuf(pixbuf);
 
     /* signal handlers would be here */
