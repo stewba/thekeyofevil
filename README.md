@@ -5,6 +5,10 @@ An image display program that uses midi to trigger image transitions.  Inspired 
 
 Thanks to the GTK homepage and http://home.roadrunner.com/~jgglatt/tech/arawmidrec.htm for the various bits of info on how to use the GTK and ALSA API's
 
+Setup
+===================
+Currently 'The Key of Evil' looks in the cwd for images named c4.jpg, d4.jpg ... c5.jpg (ie all the white notes from middle c up an octave).  This will go into a config file at some point
+
 Issues
 ===================
 The midi message currently picks up on note on and note off messages which makes for bad images transitions when playing overly legato (you get a lot of flicker).
