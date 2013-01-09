@@ -56,57 +56,57 @@ static void update_image(char* image)
 
 
 //Handle updating the displayed image from a given midi message
-static void midi_update_image(int midi_note)
+static void midi_update_image(int midi_note,int velocity)
 {
-
-    switch(midi_note)
+    if(velocity > 0)
     {
-    case C4:
-        //printf("%c",event->keyval);
-        update_image("c4.jpg");
-        break;
+        switch(midi_note)
+        {
+            case C4:
+                //printf("%c",event->keyval);
+                update_image("c4.jpg");
+                break;
 
-    case D4:
-        //printf("%c",event->keyval);
-        update_image("d4.jpg");
-        break;
+            case D4:
+                //printf("%c",event->keyval);
+                update_image("d4.jpg");
+                break;
 
-    case E4:
-        //printf("%c",event->keyval);
-        update_image("e4.jpg");
-        break;
+            case E4:
+                //printf("%c",event->keyval);
+                update_image("e4.jpg");
+                break;
 
-    case F4:
-        //printf("%c",event->keyval);
-        update_image("f4.jpg");
-        break;
+            case F4:
+                //printf("%c",event->keyval);
+                update_image("f4.jpg");
+                break;
 
-    case G4:
-        //printf("%c",event->keyval);
-        update_image("g4.jpg");
-        break;
+            case G4:
+                //printf("%c",event->keyval);
+                update_image("g4.jpg");
+                break;
 
-    case A5:
-        //printf("%c",event->keyval);
-        update_image("a5.jpg");
-        break;
+            case A5:
+                //printf("%c",event->keyval);
+                update_image("a5.jpg");
+                break;
 
-    case B5:
-        //printf("%c",event->keyval);
-        update_image("b5.jpg");
-        break;
+            case B5:
+                //printf("%c",event->keyval);
+                update_image("b5.jpg");
+                break;
 
-    case C5:
-        //printf("%c",event->keyval);
-        update_image("c5.jpg");
-        break;
+            case C5:
+                //printf("%c",event->keyval);
+                update_image("c5.jpg");
+                break;
 
-    case 96:
-        //printf("%c",event->keyval);
-        gtk_exit(0);
-        break;
-
-
+            case 96:
+                //printf("%c",event->keyval);
+                gtk_exit(0);
+                break;
+        }
     }
 
 }
@@ -133,10 +133,12 @@ static void check_midi()
         snd_rawmidi_read(midiInHandle, &velocity, 1);
     }
 
-    //print out the note, currently for debug
-    printf("%d\n",note);
+    //TODO: Should add in a check to make sure we are getting a note command
     //update the image with the last note
-    midi_update_image(note);
+    midi_update_image(note,velocity);
+    //print out the note, currently for debug
+    printf("note %d, command %d, velocity %d\n",note,command,velocity);
+    
 }
 
 //dev function used to manually trigger image updates
