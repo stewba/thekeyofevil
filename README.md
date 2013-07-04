@@ -11,7 +11,7 @@ Currently 'The Key of Evil' looks in the cwd for images named c4.jpg, d4.jpg ...
 
 Issues
 ===================
-The midi message currently picks up on note on and note off messages which makes for bad images transitions when playing overly legato (you get a lot of flicker).
+The configuration is ugly and hard coded (it was for a once off party ... sorry), in future versions I'll add a system for mapping images to notes from a config file
 
 Build
 ===================
